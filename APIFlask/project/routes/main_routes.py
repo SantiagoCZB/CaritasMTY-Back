@@ -1,5 +1,5 @@
 from flask import Blueprint
-from controllers import data_controller
+from controllers.data_controller import get_user_by_id
 
 bp = Blueprint('main', __name__)
 
@@ -7,10 +7,6 @@ bp = Blueprint('main', __name__)
 def index():
  return "API RealMadSwift ⚽"
 
-@bp.route('/data', methods=['GET'])
-def get_data():
-    return data_controller.get_data()
-
-@bp.route('/data', methods=['POST'])
-def post_data():
-    return data_controller.post_data()
+@bp.route('/<user_id>', methods=['GET'])
+def get_user(user_id):
+    return get_user_by_id(user_id)
