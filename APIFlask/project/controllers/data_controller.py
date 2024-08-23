@@ -15,14 +15,15 @@ def get_user_by_id(user_id):
         # Obtener resultados
         user_data = cursor.fetchone()
 
+
+        # Obtener nombres de las columnas
+        column_names = [desc[0] for desc in cursor.description]
+
         # Si el usuario existe
         if user_data:
-            return jsonify({
-                "ID_USUARIO": user_data[0],
-                "NOMBRE": user_data[1],
-                "A_PATERNO": user_data[2],
-                # Añadir más campos según la estructura de tu tabla
-            }), 200
+            # Convertir el resultado en un diccionario
+            user_dict = dict(zip(column_names, user_data))
+            return jsonify(user_dict), 200
         else:
             return jsonify({"error": "Usuario no encontrado"}), 404
 
