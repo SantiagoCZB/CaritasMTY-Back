@@ -1,6 +1,8 @@
 from flask import current_app, jsonify
 
-def get_user_by_id(user_id):
+
+#! Santiago
+def login(user_id):
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
