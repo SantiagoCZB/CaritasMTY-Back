@@ -6,7 +6,7 @@ def get_db_connection():
             server='10.14.255.65',
             user='SA',
             password='Shakira123.',
-            database='Caritas-DB'
+            database='CaritasDB'
         )
         return conn
     except Exception as e:
