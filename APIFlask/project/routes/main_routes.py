@@ -1,5 +1,5 @@
 from flask import Blueprint
-from controllers.data_controller import get_user_by_id
+from controllers.data_controller import login
 
 bp = Blueprint('main', __name__)
 
@@ -9,7 +9,7 @@ def index():
 
 @bp.route('/<user_id>', methods=['GET'])
 def login(user_id):
-    return get_user_by_id(user_id)
+    return login(user_id)
 
 
 
