@@ -11,6 +11,10 @@ def index():
 def login(user_id):
     return login(user_id)
 
+@bp.route('/<registrar_evento>', methods=['POST'])
+def registrar_evento():
+   return registrar_evento()
+
 
 
 
