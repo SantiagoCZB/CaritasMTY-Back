@@ -7,9 +7,9 @@ bp = Blueprint('main', __name__)
 def index():
  return "API RealMadSwift ⚽"
 
-@bp.route('/<user_id>', methods=['GET'])
-def loginRoute(user_id):
-    return login(user_id)
+@bp.route('/login', methods=['POST'])
+def loginRoute():
+    return login()
 
 @bp.route('/<registrar_evento>', methods=['POST'])
 def registrar_evento():
