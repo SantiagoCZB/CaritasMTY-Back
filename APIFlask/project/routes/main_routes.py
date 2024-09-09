@@ -8,7 +8,7 @@ def index():
  return "API RealMadSwift ⚽"
 
 @bp.route('/<user_id>', methods=['GET'])
-def login(user_id):
+def loginRoute(user_id):
     return login(user_id)
 
 @bp.route('/<registrar_evento>', methods=['POST'])
