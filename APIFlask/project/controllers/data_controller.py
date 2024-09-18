@@ -156,3 +156,34 @@ def get_users():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Kevin
+def obtener_recompensas_tienda():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Obtener todas las recompensas disponibles en la tienda
+        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO FROM RECOMPENSAS"
+        cursor.execute(recompensas_query)
+        recompensas = cursor.fetchall()
+
+        recompensas_list = []
+        for recompensa in recompensas:
+            recompensas_list.append({
+                "id_recompensa": recompensa.ID_RECOMPENSA,
+                "nombre": recompensa.NOMBRE,
+                "descripcion": recompensa.DESCRIPCION,
+                "costo": recompensa.COSTO
+            })
+
+        return jsonify({"recompensas": recompensas_list}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
