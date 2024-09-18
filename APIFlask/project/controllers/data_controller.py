@@ -158,7 +158,7 @@ def get_users():
         return jsonify({"error": str(e)}), 500
 
 # Kevin
-def obtener_recompensas_tienda():
+def get_recompensas_tienda():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
