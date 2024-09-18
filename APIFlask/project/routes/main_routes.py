@@ -1,5 +1,5 @@
 from flask import Blueprint
-from controllers.data_controller import login
+from controllers.data_controller import *
 
 bp = Blueprint('main', __name__)
 
@@ -15,6 +15,10 @@ def loginRoute():
 def registrar_evento():
    return registrar_evento()
 
+@bp.route('/users', methods=['GET'])
+def users():
+    return get_users()
 
-
-
+@bp.route('/events', methods=['GET'])
+def events():
+   return currentEvents()

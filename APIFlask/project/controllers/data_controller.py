@@ -1,5 +1,7 @@
 from flask import request, jsonify, current_app
+from datetime import time, date
 
+#!Santiago?
 def login():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
@@ -79,4 +81,78 @@ def registrar_evento():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+#!César
+def currentEvents():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Consulta para obtener los datos de los eventos
+        query = "SELECT * FROM EVENTOS"
+        cursor.execute(query)
+
+        # Obtener todos los resultados
+        events = cursor.fetchall()
+
+        # Verificar si hay eventos
+        if not events:
+            return jsonify({"message": "No hay eventos disponibles"}), 404
         
+        # Obtener los nombres de las columnas
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convertir cada evento en un diccionario y los valores 'date' y 'time'
+        # a cadenas
+
+        eventList = []
+        for event in events:
+            event_dict = dict(zip(column_names, event))
+
+            for key, value in event_dict.items():
+                if isinstance(value, time):
+                    event_dict[key] = value.strftime('%H:%M:%S')
+                elif isinstance(value, date):
+                    event_dict[key] = value.strftime('%Y-%m-%d')
+            eventList.append(event_dict)
+
+        return jsonify({"Eventos": eventList}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def get_users():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Consulta para obtener a todos los usuarios
+        query = "SELECT ID_USUARIO, NOMBRE, A_PATERNO, A_MATERNO, \
+                ID_TIPO_USUARIO, PESO, ALTURA, PRESION, USUARIO FROM USUARIOS"
+        cursor.execute(query)
+
+        # Obtener todos los resultados
+        users = cursor.fetchall()
+
+        # Verificar si hay usuarios
+        if not users:
+            return jsonify({"message": "No hay usuarios registrados"}), 404
+        
+        # Obtener los nombres de las columnas
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convertir cada usuario en un diccionario
+        # Un diccionario es una estructura de datos que
+        # almacena pares de clave-valor.
+        userList = [dict(zip(column_names, user)) for user in users]
+
+        return jsonify({"Usuarios": userList}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
