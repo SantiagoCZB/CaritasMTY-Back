@@ -187,3 +187,35 @@ def get_recompensas_tienda():
 
     finally:
         cursor.close()
+
+#Emmanuel
+def mis_eventos(id_usuario):
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+    
+    try:
+        cursor = conn.cursor()
+
+        # Consulta SQL para obtener los nombres de los eventos a los que el usuario está inscrito
+        query = """
+        SELECT E.TITULO 
+        FROM USUARIOS_EVENTOS UE
+        JOIN EVENTOS E ON UE.ID_EVENTO = E.ID_EVENTO
+        WHERE UE.ID_USUARIO = %s
+        """
+        cursor.execute(query, (id_usuario,))
+
+        # Obtener los resultados
+        eventos = cursor.fetchall()
+
+        if not eventos:
+            return jsonify({"message": "El usuario no está registrado en ningún evento"}), 404
+
+        # Crear una lista con los nombres de los eventos
+        eventos_registrados = [evento[0] for evento in eventos]
+
+        return jsonify({"eventos_registrados": eventos_registrados}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

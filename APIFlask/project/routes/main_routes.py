@@ -22,3 +22,7 @@ def users():
 @bp.route('/events', methods=['GET'])
 def events():
    return currentEvents()
+
+@bp.route('/<int:id_usuario>/mis-eventos', methods=['GET'])
+def mis_eventosRoute(id_usuario):
+    return mis_eventos(id_usuario)
