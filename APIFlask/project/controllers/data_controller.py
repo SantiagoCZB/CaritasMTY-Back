@@ -159,6 +159,41 @@ def get_users():
 
 # Kevin
 def get_recompensas_tienda():
+    """
+    Obtener todas las recompensas disponibles en la tienda
+    ---
+    responses:
+      200:
+        description: Lista de recompensas recuperada exitosamente
+        schema:
+          type: object
+          properties:
+            recompensas:
+              type: array
+              items:
+                type: object
+                properties:
+                  id_recompensa:
+                    type: integer
+                    description: ID de la recompensa
+                  nombre:
+                    type: string
+                    description: Nombre de la recompensa
+                  descripcion:
+                    type: string
+                    description: Descripción de la recompensa
+                  costo:
+                    type: number
+                    description: Costo en puntos para adquirir la recompensa
+      500:
+        description: Error al conectarse a la base de datos o ejecutar la consulta
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: Mensaje de error
+    """
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
@@ -187,7 +222,8 @@ def get_recompensas_tienda():
 
     finally:
         cursor.close()
-
+        
+        
 #Emmanuel
 def mis_eventos(id_usuario):
     conn = current_app.config['DB_CONNECTION']
