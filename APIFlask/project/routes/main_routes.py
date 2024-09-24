@@ -15,6 +15,10 @@ def loginRoute():
 def registrar_evento():
    return registrar_evento()
 
+@bp.route('/<cancelar_registro>', methods=['DELETE'])
+def cancelar_registro():
+   return cancelar_registro()
+
 @bp.route('/users', methods=['GET'])
 def users():
     return get_users()

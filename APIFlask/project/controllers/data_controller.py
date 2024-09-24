@@ -80,6 +80,48 @@ def registrar_evento():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+def cancelar_registro():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    data = request.json
+    id_usuario = data.get('id_usuario')
+    id_evento = data.get('id_evento')
+
+    try:
+        cursor = conn.cursor()
+
+        # Verificar si el evento existe
+        evento_query = "SELECT CUPO FROM EVENTOS WHERE ID_EVENTO = %s"
+        cursor.execute(evento_query, (id_evento,))
+        evento = cursor.fetchone()
+
+        if not evento:
+            return jsonify({"error": "El evento no existe"}), 404
+
+        # Verificar si el usuario está registrado en el evento
+        check_user_query = "SELECT COUNT(*) FROM USUARIOS_EVENTOS WHERE ID_USUARIO = %s AND ID_EVENTO = %s"
+        cursor.execute(check_user_query, (id_usuario, id_evento))
+        is_registered = cursor.fetchone()[0]
+
+        if not is_registered:
+            return jsonify({"error": "El usuario no está registrado en el evento"}), 400
+
+        # Eliminar el registro del usuario en USUARIOS_EVENTOS
+        delete_query = "DELETE FROM USUARIOS_EVENTOS WHERE ID_USUARIO = %s AND ID_EVENTO = %s"
+        cursor.execute(delete_query, (id_usuario, id_evento))
+
+        # Confirmar transacción
+        conn.commit()
+
+        return jsonify({"message": "Registro cancelado exitosamente"}), 200
+
+    except Exception as e:
+        conn.rollback()  # Revertir la transacción en caso de error
+        return jsonify({"error": str(e)}), 500
+
 
 #!César
 def currentEvents():
