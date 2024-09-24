@@ -271,13 +271,13 @@ def mis_eventos(id_usuario):
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
-    
+
     try:
         cursor = conn.cursor()
 
-        # Consulta SQL para obtener los nombres de los eventos a los que el usuario está inscrito
+        # Consulta SQL para obtener todos los datos de los eventos a los que el usuario está inscrito
         query = """
-        SELECT E.TITULO 
+        SELECT E.ID_EVENTO, E.TITULO, E.FECHA, E.HORA, E.DESCRIPCION, E.CUPO, E.PUNTOS, E.TIPO_EVENTO 
         FROM USUARIOS_EVENTOS UE
         JOIN EVENTOS E ON UE.ID_EVENTO = E.ID_EVENTO
         WHERE UE.ID_USUARIO = %s
@@ -287,13 +287,28 @@ def mis_eventos(id_usuario):
         # Obtener los resultados
         eventos = cursor.fetchall()
 
+        # Verificar si hay eventos
         if not eventos:
             return jsonify({"message": "El usuario no está registrado en ningún evento"}), 404
 
-        # Crear una lista con los nombres de los eventos
-        eventos_registrados = [evento[0] for evento in eventos]
+        # Obtener los nombres de las columnas de la consulta
+        column_names = [desc[0] for desc in cursor.description]
 
-        return jsonify({"eventos_registrados": eventos_registrados}), 200
+        # Convertir cada evento en un diccionario, formatear las fechas y horas como cadenas
+        eventList = []
+        for event in eventos:
+            event_dict = dict(zip(column_names, event))
+
+            # Convertir 'date' y 'time' a formato de cadena
+            for key, value in event_dict.items():
+                if isinstance(value, time):
+                    event_dict[key] = value.strftime('%H:%M:%S')
+                elif isinstance(value, date):
+                    event_dict[key] = value.strftime('%Y-%m-%d')
+
+            eventList.append(event_dict)
+
+        return jsonify({"Eventos": eventList}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
