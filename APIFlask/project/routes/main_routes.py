@@ -11,13 +11,16 @@ def index():
 def loginRoute():
     return login()
 
-@bp.route('/<registrar_evento>', methods=['POST'])
-def registrar_evento():
-   return registrar_evento()
 
-# Probamos en curl así:
-# curl -X DELETE -H "Content-Type: application/json" -d '{"id_usuario": 123, "id_evento": 456}' http://localhost:5000/cancelar-registro
-@bp.route('/<cancelar_registro>', methods=['DELETE'])
+# Probamos en cURL
+# curl -X POST -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" http://127.0.0.1:3000/registrar_evento
+@bp.route('/registrar_evento', methods=['POST'])
+def registrar_evento():
+   return registrar()
+
+# Probamos en cURL así (Después del registrar evento. Escapar comillas dentro del formato JSON con '\'):
+# curl -X DELETE -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" http://127.0.0.1:3000/cancelar_registro
+@bp.route('/cancelar_registro', methods=['DELETE'])
 def cancelar_registro():
    """
     Cancela el registro de un usuario en un evento
@@ -77,7 +80,7 @@ def cancelar_registro():
                   type: string
                   description: Mensaje de error
    """
-   return cancelar_registro()
+   return cancelar()
 
 @bp.route('/users', methods=['GET'])
 def users():

@@ -41,7 +41,7 @@ def login():
 
 
 #!Rafa
-def registrar_evento():
+def registrar():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
@@ -82,7 +82,7 @@ def registrar_evento():
         return jsonify({"error": str(e)}), 500
 
 #!César
-def cancelar_registro():
+def cancelar():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
@@ -123,7 +123,7 @@ def cancelar_registro():
         conn.rollback()  # Revertir la transacción en caso de error
         return jsonify({"error": str(e)}), 500
     
-    
+
 def currentEvents():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
