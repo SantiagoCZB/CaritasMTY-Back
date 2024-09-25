@@ -199,7 +199,7 @@ def get_users():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Kevin
+#!Kevin
 def get_recompensas_tienda():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
