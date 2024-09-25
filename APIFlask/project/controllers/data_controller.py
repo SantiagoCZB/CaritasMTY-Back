@@ -277,3 +277,32 @@ def mis_eventos(id_usuario):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+def verificar_registro():
+    # Obtener la conexión a la base de datos desde la configuración de la aplicación
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    # Obtener los datos del cuerpo de la solicitud
+    data = request.json
+    id_usuario = data.get('id_usuario')
+    id_evento = data.get('id_evento')
+
+    try:
+        cursor = conn.cursor()
+
+        # Verificar si el registro existe en la tabla USUARIOS_EVENTOS
+        query = "SELECT 1 FROM USUARIOS_EVENTOS WHERE ID_USUARIO = %s AND ID_EVENTO = %s"
+        cursor.execute(query, (id_usuario, id_evento))
+        registro = cursor.fetchone()
+
+        # Si se encuentra el registro, devolver true, si no, devolver false
+        if registro:
+            return jsonify({"exists": True}), 200
+        else:
+            return jsonify({"exists": False}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

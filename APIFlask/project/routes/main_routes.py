@@ -265,3 +265,7 @@ def storeRewards():
 @bp.route('/<int:id_usuario>/mis-eventos', methods=['GET'])
 def mis_eventosRoute(id_usuario):
    return mis_eventos(id_usuario)
+ 
+@bp.route('/verificar_registro', methods=['POST'])
+def verificar_registroRoute():
+   return verificar_registro()
