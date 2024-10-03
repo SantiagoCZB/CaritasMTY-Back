@@ -306,3 +306,30 @@ def verificar_registro():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+def get_puntos_usuario():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    id_usuario = request.args.get('id_usuario')
+    
+    if not id_usuario:
+        return jsonify({"error": "id_usuario is required"}), 400
+    
+    try:
+        cursor = conn.cursor()
+        query = "SELECT PUNTAJE FROM USUARIOS WHERE ID_USUARIO = %s"
+        cursor.execute(query, (id_usuario,))
+        puntos = cursor.fetchone()
+        
+        if puntos:
+            return jsonify({"puntos": puntos[0]}), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
