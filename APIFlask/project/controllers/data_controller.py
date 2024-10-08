@@ -314,6 +314,7 @@ def verificar_registro():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+    
 def get_puntos_usuario():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
@@ -413,3 +414,97 @@ def mis_retos(id_usuario):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+def registrarReto():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    data = request.json
+    id_usuario = data.get('id_usuario')
+    id_reto = data.get('id_reto')
+
+    try:
+        cursor = conn.cursor()
+
+        # Verificar si el reto ya está registrado para el usuario
+        check_query = "SELECT COUNT(*) FROM USUARIOS_RETOS WHERE ID_USUARIO = %s AND ID_RETO = %s"
+        cursor.execute(check_query, (id_usuario, id_reto))
+        already_registered = cursor.fetchone()[0]
+
+        if already_registered:
+            return jsonify({"error": "El usuario ya está registrado en este reto"}), 400
+
+        # Insertar el nuevo registro en USUARIOS_RETOS con CUMPLIDO en 0
+        insert_query = "INSERT INTO USUARIOS_RETOS (ID_USUARIO, ID_RETO, CUMPLIDO) VALUES (%s, %s, %s)"
+        cursor.execute(insert_query, (id_usuario, id_reto, 0))
+        conn.commit()
+
+        return jsonify({"message": "Usuario registrado en el reto exitosamente"}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+def cancelarReto():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    data = request.json
+    id_usuario = data.get('id_usuario')
+    id_reto = data.get('id_reto')
+
+    try:
+        cursor = conn.cursor()
+
+        # Verificar si el usuario está registrado en el reto
+        check_user_query = "SELECT COUNT(*) FROM USUARIOS_RETOS WHERE ID_USUARIO = %s AND ID_RETO = %s"
+        cursor.execute(check_user_query, (id_usuario, id_reto))
+        is_registered = cursor.fetchone()[0]
+
+        if not is_registered:
+            return jsonify({"error": "El usuario no está registrado en el reto"}), 400
+
+        # Eliminar el registro del usuario en USUARIOS_RETOS
+        delete_query = "DELETE FROM USUARIOS_RETOS WHERE ID_USUARIO = %s AND ID_RETO = %s"
+        cursor.execute(delete_query, (id_usuario, id_reto))
+
+        # Confirmar transacción
+        conn.commit()
+
+        return jsonify({"message": "Registro cancelado exitosamente"}), 200
+
+    except Exception as e:
+        conn.rollback()  # Revertir la transacción en caso de error
+        return jsonify({"error": str(e)}), 500
+
+    
+    
+def verificar_registroReto():
+    # Obtener la conexión a la base de datos desde la configuración de la aplicación
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    # Obtener los datos del cuerpo de la solicitud
+    data = request.json
+    id_usuario = data.get('id_usuario')
+    id_reto = data.get('id_reto')
+
+    try:
+        cursor = conn.cursor()
+
+        # Verificar si el registro existe en la tabla USUARIOS_RETOS
+        query = "SELECT 1 FROM USUARIOS_RETOS WHERE ID_USUARIO = %s AND ID_RETO = %s"
+        cursor.execute(query, (id_usuario, id_reto))
+        registro = cursor.fetchone()
+
+        # Si se encuentra el registro, devolver true, si no, devolver false
+        if registro:
+            return jsonify({"exists": True}), 200
+        else:
+            return jsonify({"exists": False}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

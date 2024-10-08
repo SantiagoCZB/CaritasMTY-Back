@@ -277,3 +277,15 @@ def retos():
 @bp.route('/<int:id_usuario>/mis-retos', methods=['GET'])
 def mis_retosRoute(id_usuario):
    return mis_retos(id_usuario)
+ 
+@bp.route('/registrar_reto', methods=['POST'])
+def registrar_reto():
+   return registrarReto()
+
+@bp.route('/cancelar_reto', methods=['DELETE'])
+def cancelar_registro_reto():
+  return cancelarReto()
+
+@bp.route('/verificar_reto', methods=['POST'])
+def verificar_registro_retoRoute():
+   return verificar_registroReto()
