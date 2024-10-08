@@ -132,8 +132,13 @@ def currentEvents():
     try:
         cursor = conn.cursor()
 
-        # Consulta para obtener los datos de los eventos
-        query = "SELECT * FROM EVENTOS"
+        # Consulta para obtener los eventos que aún no han ocurrido
+        query = """
+        SELECT * 
+        FROM EVENTOS 
+        WHERE (FECHA > CAST(GETDATE() AS DATE)) 
+        OR (FECHA = CAST(GETDATE() AS DATE) AND HORA > CAST(GETDATE() AS TIME))
+        """
         cursor.execute(query)
 
         # Obtener todos los resultados
@@ -240,12 +245,13 @@ def mis_eventos(id_usuario):
     try:
         cursor = conn.cursor()
 
-        # Consulta SQL para obtener todos los datos de los eventos a los que el usuario está inscrito
+        # Consulta SQL para obtener solo los eventos con asistencia en 0
         query = """
         SELECT E.ID_EVENTO, E.TITULO, E.FECHA, E.HORA, E.DESCRIPCION, E.CUPO, E.PUNTOS, E.TIPO_EVENTO 
         FROM USUARIOS_EVENTOS UE
         JOIN EVENTOS E ON UE.ID_EVENTO = E.ID_EVENTO
         WHERE UE.ID_USUARIO = %s
+        AND UE.ASISTENCIA = 0
         """
         cursor.execute(query, (id_usuario,))
 
@@ -277,6 +283,7 @@ def mis_eventos(id_usuario):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
     
     
 def verificar_registro():
