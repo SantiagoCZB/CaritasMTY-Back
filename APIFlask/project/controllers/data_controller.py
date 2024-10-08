@@ -340,3 +340,76 @@ def get_puntos_usuario():
 
     finally:
         cursor.close()
+        
+def obtenerRetos():
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Consulta para obtener todos los registros de la tabla RETOS
+        query = "SELECT * FROM RETOS"
+        cursor.execute(query)
+
+        # Obtener todos los resultados
+        retos = cursor.fetchall()
+
+        # Verificar si hay retos
+        if not retos:
+            return jsonify({"message": "No hay retos disponibles"}), 404
+
+        # Obtener los nombres de las columnas
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convertir cada registro de RETOS en un diccionario
+        retosList = []
+        for reto in retos:
+            reto_dict = dict(zip(column_names, reto))
+            retosList.append(reto_dict)
+
+        return jsonify({"Retos": retosList}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+def mis_retos(id_usuario):
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Consulta SQL para obtener los retos que no han sido cumplidos (CUMPLIDO = 0)
+        query = """
+        SELECT R.ID_RETO, R.NOMBRE, R.DESCRIPCION, R.PUNTAJE
+        FROM USUARIOS_RETOS UR
+        JOIN RETOS R ON UR.ID_RETO = R.ID_RETO
+        WHERE UR.ID_USUARIO = %s
+        AND UR.CUMPLIDO = 0
+        """
+        cursor.execute(query, (id_usuario,))
+
+        # Obtener los resultados
+        retos = cursor.fetchall()
+
+        # Verificar si hay retos
+        if not retos:
+            return jsonify({"message": "El usuario no tiene retos pendientes"}), 404
+
+        # Obtener los nombres de las columnas de la consulta
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convertir cada reto en un diccionario
+        retosList = []
+        for reto in retos:
+            reto_dict = dict(zip(column_names, reto))
+            retosList.append(reto_dict)
+
+        return jsonify({"Retos": retosList}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+

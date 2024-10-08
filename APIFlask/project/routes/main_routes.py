@@ -269,3 +269,11 @@ def mis_eventosRoute(id_usuario):
 @bp.route('/verificar_registro', methods=['POST'])
 def verificar_registroRoute():
    return verificar_registro()
+ 
+@bp.route('/retos', methods=['GET'])
+def retos():
+  return obtenerRetos()
+
+@bp.route('/<int:id_usuario>/mis-retos', methods=['GET'])
+def mis_retosRoute(id_usuario):
+   return mis_retos(id_usuario)
