@@ -520,7 +520,7 @@ def obtenerRecompensas():
     try:
         cursor = conn.cursor()
 
-        # Consulta para obtener todas las recompensas
+        # Consulta para obtener todas las recompensas con NOMBRE y COSTO
         recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO FROM RECOMPENSAS"
         cursor.execute(recompensas_query)
         recompensas = cursor.fetchall()
