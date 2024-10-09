@@ -541,16 +541,19 @@ def obtenerRecompensas():
         # Convertir las recompensas compradas en un conjunto para fácil búsqueda
         recompensas_compradas_set = {row[0] for row in recompensas_compradas}
 
-        # Obtener los nombres de las columnas de la tabla RECOMPENSAS
-        column_names = [desc[0] for desc in cursor.description]
-
         # Generar la lista de recompensas con el campo extra "COMPRADO"
         recompensasList = []
         for recompensa in recompensas:
-            recompensa_dict = dict(zip(column_names, recompensa))
+            id_recompensa, nombre, descripcion, costo = recompensa  # Extraemos cada campo por su nombre
             
-            # Si la recompensa está en el conjunto de compradas, añadir "COMPRADO": true
-            recompensa_dict["COMPRADO"] = recompensa_dict["ID_RECOMPENSA"] in recompensas_compradas_set
+            # Crear un diccionario para la recompensa
+            recompensa_dict = {
+                "ID_RECOMPENSA": id_recompensa,
+                "NOMBRE": nombre,
+                "DESCRIPCION": descripcion,
+                "COSTO": costo,
+                "COMPRADO": id_recompensa in recompensas_compradas_set  # Si la recompensa está comprada, poner COMPRADO: true
+            }
             recompensasList.append(recompensa_dict)
 
         return jsonify({"Recompensas": recompensasList}), 200
