@@ -508,3 +508,49 @@ def verificar_registroReto():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+def obtenerRecompensas(id_usuario):
+    conn = current_app.config['DB_CONNECTION']
+    if conn is None:
+        return jsonify({"error": "No database connection available"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Consulta para obtener todas las recompensas
+        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO FROM RECOMPENSAS"
+        cursor.execute(recompensas_query)
+        recompensas = cursor.fetchall()
+
+        # Verificar si hay recompensas
+        if not recompensas:
+            return jsonify({"message": "No hay recompensas disponibles"}), 404
+
+        # Obtener las recompensas ya compradas por el usuario
+        compradas_query = """
+        SELECT ID_RECOMPENSA 
+        FROM USUARIOS_RECOMPENSAS 
+        WHERE ID_USUARIO = %s
+        """
+        cursor.execute(compradas_query, (id_usuario,))
+        recompensas_compradas = cursor.fetchall()
+
+        # Convertir las recompensas compradas en un conjunto para fácil búsqueda
+        recompensas_compradas_set = {row[0] for row in recompensas_compradas}
+
+        # Obtener los nombres de las columnas de la tabla RECOMPENSAS
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Generar la lista de recompensas con el campo extra "COMPRADO"
+        recompensasList = []
+        for recompensa in recompensas:
+            recompensa_dict = dict(zip(column_names, recompensa))
+            
+            # Si la recompensa está en el conjunto de compradas, añadir "COMPRADO": true
+            recompensa_dict["COMPRADO"] = recompensa_dict["ID_RECOMPENSA"] in recompensas_compradas_set
+            recompensasList.append(recompensa_dict)
+
+        return jsonify({"Recompensas": recompensasList}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

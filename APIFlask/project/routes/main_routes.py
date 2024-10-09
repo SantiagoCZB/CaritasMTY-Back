@@ -289,3 +289,8 @@ def cancelar_registro_reto():
 @bp.route('/verificar_reto', methods=['POST'])
 def verificar_registro_retoRoute():
    return verificar_registroReto()
+ 
+@bp.route('/recompensas', methods=['POST'])
+def recompensasRoute():
+   return obtenerRecompensas()
+
