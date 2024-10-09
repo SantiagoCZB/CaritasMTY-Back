@@ -1,13 +1,18 @@
 from flask import Blueprint
 from controllers.data_controller import *
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from app import limiter
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
+@limiter.limit("100 per minute")
 def index():
- return "API RealMadSwift ⚽"
+  return "API RealMadSwift ⚽"
 
 @bp.route('/login', methods=['POST'])
+@limiter.limit("10 per minute")
 def loginRoute():
     return login()
 
@@ -15,12 +20,14 @@ def loginRoute():
 # Probamos en cURL
 # curl -X POST -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" http://127.0.0.1:3000/registrar_evento
 @bp.route('/registrar_evento', methods=['POST'])
+@limiter.limit("100 per minute")
 def registrar_evento():
    return registrar()
 
 # Probamos en cURL así (Después del registrar evento. Escapar comillas dentro del formato JSON con '\'):
 # curl -X DELETE -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" http://127.0.0.1:3000/cancelar_registro
 @bp.route('/cancelar_registro', methods=['DELETE'])
+@limiter.limit("100 per minute")
 def cancelar_registro():
    """
     Cancela el registro de un usuario en un evento
@@ -83,6 +90,7 @@ def cancelar_registro():
    return cancelar()
 
 @bp.route('/users', methods=['GET'])
+@limiter.limit("100 per minute")
 def users():
    """
     Despliega todos los usuarios disponibles desde la base de datos
@@ -153,6 +161,7 @@ def users():
    return get_users()
 
 @bp.route('/events', methods=['GET'])
+@limiter.limit("100 per minute")
 def events():
    """
     Despliega todos los eventos disponibles desde la base de datos
@@ -224,6 +233,7 @@ def events():
    return currentEvents()
 
 @bp.route('/storeRewards', methods=['GET'])
+@limiter.limit("100 per minute")
 def storeRewards():
    """
     Obtener todas las recompensas disponibles en la tienda
@@ -263,34 +273,42 @@ def storeRewards():
    return get_recompensas_tienda
 
 @bp.route('/<int:id_usuario>/mis-eventos', methods=['GET'])
+@limiter.limit("100 per minute")
 def mis_eventosRoute(id_usuario):
    return mis_eventos(id_usuario)
  
 @bp.route('/verificar_registro', methods=['POST'])
+@limiter.limit("100 per minute")
 def verificar_registroRoute():
    return verificar_registro()
  
 @bp.route('/retos', methods=['GET'])
+@limiter.limit("100 per minute")
 def retos():
   return obtenerRetos()
 
 @bp.route('/<int:id_usuario>/mis-retos', methods=['GET'])
+@limiter.limit("100 per minute")
 def mis_retosRoute(id_usuario):
    return mis_retos(id_usuario)
  
 @bp.route('/registrar_reto', methods=['POST'])
+@limiter.limit("100 per minute")
 def registrar_reto():
    return registrarReto()
 
 @bp.route('/cancelar_reto', methods=['DELETE'])
+@limiter.limit("100 per minute")
 def cancelar_registro_reto():
   return cancelarReto()
 
 @bp.route('/verificar_reto', methods=['POST'])
+@limiter.limit("100 per minute")
 def verificar_registro_retoRoute():
    return verificar_registroReto()
  
 @bp.route('/recompensas', methods=['POST'])
+@limiter.limit("100 per minute")
 def recompensasRoute():
    return obtenerRecompensas()
 
