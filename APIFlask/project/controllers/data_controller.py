@@ -509,10 +509,13 @@ def verificar_registroReto():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-def obtenerRecompensas(id_usuario):
+def obtenerRecompensas():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
+    
+    data = request.json
+    id_usuario = data.get('id_usuario')
 
     try:
         cursor = conn.cursor()
