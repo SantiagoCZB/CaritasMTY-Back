@@ -4,6 +4,7 @@ app = create_app()
 
 API_CERT = '/home/user01/realmadswift.tc2007b.tec.mx.cer'
 API_KEY = '/home/user01/realmadswift.tc2007b.tec.mx.key'
+
 if __name__ == '__main__':
 	import ssl
 	context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)

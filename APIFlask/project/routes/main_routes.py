@@ -10,7 +10,7 @@ def index():
   return "API RealMadSwift ⚽"
 
 @bp.route('/login', methods=['POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("100 per minute")
 def loginRoute():
     return login()
 

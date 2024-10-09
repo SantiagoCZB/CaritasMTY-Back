@@ -6,15 +6,14 @@ from flasgger import Swagger
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+# Limitador Global de Peticiones
+limiter = Limiter(
+    get_remote_address, 
+    default_limits=["20000 per day", "5000 per hour"]
+)
+
 def create_app():
     app = Flask(__name__)
-
-    # Limitador Global de Peticiones
-    limiter = Limiter(
-        get_remote_address, 
-        app = app, 
-        default_limits=["20000 per day", "5000 per hour"]
-    )
 
     # Asociamos swagger al app 
     swagger = Swagger(app, template={
@@ -25,6 +24,9 @@ def create_app():
         }
     })
 
+    # Asociamos un Limiter a la App
+    limiter.init_app(app)
+
     CORS(app)
     
     # Registrar el blueprint
@@ -33,5 +35,4 @@ def create_app():
     # Inicializar la conexión a la base de datos
     app.config['DB_CONNECTION'] = get_db_connection()
 
-    if __name__ == "__main__":
-        return app
+    return app
