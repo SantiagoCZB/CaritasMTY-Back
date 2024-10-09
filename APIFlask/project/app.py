@@ -3,14 +3,7 @@ from flask_cors import CORS
 from db import get_db_connection
 from routes.main_routes import bp as main_bp
 from flasgger import Swagger
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-
-# Limitador Global de Peticiones
-limiter = Limiter(
-    get_remote_address, 
-    default_limits=["20000 per day", "5000 per hour"]
-)
+from routes.limiter import limiter
 
 def create_app():
     app = Flask(__name__)
