@@ -7,6 +7,11 @@ load_dotenv()
 
 def get_db_connection():
     try:
+        
+        print(f"DB_SERVER: {os.getenv('DB_SERVER')}")
+        print(f"DB_USER: {os.getenv('DB_USER')}")
+        print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
+        print(f"DB_NAME: {os.getenv('DB_NAME')}")
         conn = pymssql.connect(
             server=os.getenv('DB_SERVER'),
             user=os.getenv('DB_USER'),
