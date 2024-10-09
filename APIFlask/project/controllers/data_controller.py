@@ -520,8 +520,8 @@ def obtenerRecompensas():
     try:
         cursor = conn.cursor()
 
-        # Consulta para obtener todas las recompensas con NOMBRE y COSTO
-        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO FROM RECOMPENSAS"
+        # Consulta para obtener todas las recompensas con NOMBRE, COSTO, DESCRIPCION y RESTANTES
+        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO, RESTANTES FROM RECOMPENSAS"
         cursor.execute(recompensas_query)
         recompensas = cursor.fetchall()
 
@@ -541,17 +541,22 @@ def obtenerRecompensas():
         # Convertir las recompensas compradas en un conjunto para fácil búsqueda
         recompensas_compradas_set = {row[0] for row in recompensas_compradas}
 
-        # Generar la lista de recompensas con el campo extra "COMPRADO"
+        # Generar la lista de recompensas con el campo extra "COMPRADO" y excluyendo las que tienen RESTANTES = 0
         recompensasList = []
         for recompensa in recompensas:
-            id_recompensa, nombre, descripcion, costo = recompensa  # Extraemos cada campo por su nombre
+            id_recompensa, nombre, descripcion, costo, restantes = recompensa  # Extraemos los campos incluyendo RESTANTES
             
+            # Si el valor de RESTANTES es 0, no incluir la recompensa en la lista
+            if restantes == 0:
+                continue
+
             # Crear un diccionario para la recompensa
             recompensa_dict = {
                 "ID_RECOMPENSA": id_recompensa,
                 "NOMBRE": nombre,
                 "DESCRIPCION": descripcion,
                 "COSTO": costo,
+                "RESTANTES": restantes,  # Incluimos el campo RESTANTES en el JSON
                 "COMPRADO": id_recompensa in recompensas_compradas_set  # Si la recompensa está comprada, poner COMPRADO: true
             }
             recompensasList.append(recompensa_dict)
