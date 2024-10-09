@@ -3,7 +3,7 @@ from flask_cors import CORS
 from db import get_db_connection
 from routes.main_routes import bp as main_bp
 from flasgger import Swagger
-from routes.limiter import limiter
+from requestLimit import limiter
 
 def create_app():
     app = Flask(__name__)
@@ -25,7 +25,7 @@ def create_app():
     # Inicializar la conexión a la base de datos
     app.config['DB_CONNECTION'] = get_db_connection()
 
-    # Asociamos un Limiter a la App
+    # Asociamos Limiter a la App
     limiter.init_app(app)
 
     return app

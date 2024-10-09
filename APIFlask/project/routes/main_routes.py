@@ -1,6 +1,6 @@
 from flask import Blueprint
 from controllers.data_controller import *
-from limiter import limiter
+from APIFlask.project.requestLimit import limiter
 
 bp = Blueprint('main', __name__)
 
