@@ -8,7 +8,7 @@ from flasgger import Swagger
 def create_app():
     app = Flask(__name__)
 
-    # Asociamos swagger al app
+    # Asociamos swagger al app 
     swagger = Swagger(app, template={
         "info": {
             "title": "API Gestor de salud y bienestar",

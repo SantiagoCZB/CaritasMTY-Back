@@ -1,17 +1,14 @@
 import pymssql
-from dotenv import load_dotenv
 import os
 
-# Cargar las variables desde el archivo .env
-load_dotenv()
 
 def get_db_connection():
     try:
         conn = pymssql.connect(
-            server=os.getenv('DB_SERVER'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME')
+            server='10.14.255.65',
+            user='SA',
+            password='Shakira123.',
+            database='CaritasDB'
         )
         return conn
     except Exception as e:
