@@ -17,9 +17,6 @@ def create_app():
         }
     })
 
-    # Asociamos un Limiter a la App
-    limiter.init_app(app)
-
     CORS(app)
     
     # Registrar el blueprint
@@ -27,6 +24,9 @@ def create_app():
 
     # Inicializar la conexión a la base de datos
     app.config['DB_CONNECTION'] = get_db_connection()
+
+    # Asociamos un Limiter a la App
+    limiter.init_app(app)
 
     return app
 
