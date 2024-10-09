@@ -29,3 +29,7 @@ def create_app():
     app.config['DB_CONNECTION'] = get_db_connection()
 
     return app
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run()
