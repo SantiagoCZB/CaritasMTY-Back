@@ -1,7 +1,5 @@
 from flask import Blueprint
 from controllers.data_controller import *
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from app import limiter
 
 bp = Blueprint('main', __name__)
