@@ -552,41 +552,49 @@ def comprarRecompensa():
     try:
         cursor = conn.cursor()
 
-        # 1. Obtener el puntaje del usuario
+        # 1. Verificar si el usuario ya ha comprado la recompensa
+        query_ya_comprada = """
+        SELECT * FROM USUARIOS_RECOMPENSAS WHERE ID_USUARIO = %s AND ID_RECOMPENSA = %s
+        """
+        cursor.execute(query_ya_comprada, (id_usuario, id_recompensa))
+        recompensa_comprada = cursor.fetchone()
+
+        if recompensa_comprada:
+            return jsonify({"message": "Ya has comprado esta recompensa"}), 400
+
+        # 2. Obtener el puntaje del usuario
         query_puntaje_usuario = """
         SELECT PUNTAJE FROM USUARIOS WHERE ID_USUARIO = %s
         """
         cursor.execute(query_puntaje_usuario, (id_usuario,))
         resultado_usuario = cursor.fetchone()
 
-        # Verificar si se obtuvo un resultado
         if resultado_usuario is None:
             return jsonify({"error": "Usuario no encontrado"}), 404
         
         puntaje_usuario = resultado_usuario[0]
 
-        # 2. Obtener el costo y restantes de la recompensa
+        # 3. Obtener el costo y restantes de la recompensa
         query_recompensa = """
         SELECT COSTO, RESTANTES FROM RECOMPENSAS WHERE ID_RECOMPENSA = %s
         """
         cursor.execute(query_recompensa, (id_recompensa,))
         resultado_recompensa = cursor.fetchone()
 
-        # Verificar si se obtuvo un resultado
         if resultado_recompensa is None:
             return jsonify({"error": "Recompensa no encontrada"}), 404
 
         costo_recompensa, restantes_recompensa = resultado_recompensa
 
-        # 3. Verificar si el usuario tiene suficientes monedas
+        # 4. Verificar si el usuario tiene suficientes monedas
         if puntaje_usuario < costo_recompensa:
             return jsonify({"message": "No tienes suficientes monedas"}), 400
 
-        # 4. Verificar si quedan recompensas disponibles
+        # 5. Verificar si quedan recompensas disponibles
         if restantes_recompensa <= 0:
             return jsonify({"message": "No quedan recompensas disponibles"}), 400
 
-        # 5. Realizar las actualizaciones:
+        # 6. Realizar las actualizaciones:
         # Restar el costo de la recompensa al puntaje del usuario
         update_puntaje_usuario = """
         UPDATE USUARIOS SET PUNTAJE = PUNTAJE - %s WHERE ID_USUARIO = %s
@@ -599,7 +607,7 @@ def comprarRecompensa():
         """
         cursor.execute(update_recompensa_restantes, (id_recompensa,))
 
-        # 6. Registrar la compra en la tabla USUARIOS_RECOMPENSAS (si tienes esta tabla)
+        # Registrar la compra en la tabla USUARIOS_RECOMPENSAS
         insert_compra = """
         INSERT INTO USUARIOS_RECOMPENSAS (ID_USUARIO, ID_RECOMPENSA) VALUES (%s, %s)
         """
@@ -611,9 +619,4 @@ def comprarRecompensa():
         return jsonify({"message": "Compra realizada con éxito"}), 200
 
     except Exception as e:
-        # En caso de error, devolver mensaje de error
         return jsonify({"error": str(e)}), 500
-
-
-    
-    
