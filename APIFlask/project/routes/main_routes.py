@@ -230,46 +230,6 @@ def events():
    """
    return currentEvents()
 
-@bp.route('/storeRewards', methods=['GET'])
-@limiter.limit("100 per minute")
-def storeRewards():
-   """
-    Obtener todas las recompensas disponibles en la tienda
-    ---
-    responses:
-      200:
-        description: Lista de recompensas recuperada exitosamente
-        schema:
-          type: object
-          properties:
-            recompensas:
-              type: array
-              items:
-                type: object
-                properties:
-                  id_recompensa:
-                    type: integer
-                    description: ID de la recompensa
-                  nombre:
-                    type: string
-                    description: Nombre de la recompensa
-                  descripcion:
-                    type: string
-                    description: Descripción de la recompensa
-                  costo:
-                    type: number
-                    description: Costo en puntos para adquirir la recompensa
-      500:
-        description: Error al conectarse a la base de datos o ejecutar la consulta
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              description: Mensaje de error
-   """
-   return get_recompensas_tienda
-
 @bp.route('/<int:id_usuario>/mis-eventos', methods=['GET'])
 @limiter.limit("100 per minute")
 def mis_eventosRoute(id_usuario):
@@ -310,3 +270,7 @@ def verificar_registro_retoRoute():
 def recompensasRoute():
    return obtenerRecompensas()
 
+@bp.route('/comprar', methods=['POST'])
+@limiter.limit("100 per minute")
+def comprarRoute():
+   return comprarRecompensa()

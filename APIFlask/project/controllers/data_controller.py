@@ -205,35 +205,63 @@ def get_users():
         return jsonify({"error": str(e)}), 500
 
 #!Kevin
-def get_recompensas_tienda():
+def obtenerRecompensas():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
+    
+    data = request.json
+    id_usuario = data.get('id_usuario')
 
     try:
         cursor = conn.cursor()
 
-        # Obtener todas las recompensas disponibles en la tienda
-        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO FROM RECOMPENSAS"
+        # Consulta para obtener todas las recompensas con NOMBRE, COSTO, DESCRIPCION y RESTANTES
+        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO, RESTANTES FROM RECOMPENSAS"
         cursor.execute(recompensas_query)
         recompensas = cursor.fetchall()
 
-        recompensas_list = []
-        for recompensa in recompensas:
-            recompensas_list.append({
-                "id_recompensa": recompensa.ID_RECOMPENSA,
-                "nombre": recompensa.NOMBRE,
-                "descripcion": recompensa.DESCRIPCION,
-                "costo": recompensa.COSTO
-            })
+        # Verificar si hay recompensas
+        if not recompensas:
+            return jsonify({"message": "No hay recompensas disponibles"}), 404
 
-        return jsonify({"recompensas": recompensas_list}), 200
+        # Obtener las recompensas ya compradas por el usuario
+        compradas_query = """
+        SELECT ID_RECOMPENSA 
+        FROM USUARIOS_RECOMPENSAS 
+        WHERE ID_USUARIO = %s
+        """
+        cursor.execute(compradas_query, (id_usuario,))
+        recompensas_compradas = cursor.fetchall()
+
+        # Convertir las recompensas compradas en un conjunto para fácil búsqueda
+        recompensas_compradas_set = {row[0] for row in recompensas_compradas}
+
+        # Generar la lista de recompensas con el campo extra "COMPRADO" y excluyendo las que tienen RESTANTES = 0
+        recompensasList = []
+        for recompensa in recompensas:
+            id_recompensa, nombre, descripcion, costo, restantes = recompensa  # Extraemos los campos incluyendo RESTANTES
+            
+            # Si el valor de RESTANTES es 0, no incluir la recompensa en la lista
+            if restantes == 0:
+                continue
+
+            # Crear un diccionario para la recompensa
+            recompensa_dict = {
+                "ID_RECOMPENSA": id_recompensa,
+                "NOMBRE": nombre,
+                "DESCRIPCION": descripcion,
+                "COSTO": costo,
+                "RESTANTES": restantes,  # Incluimos el campo RESTANTES en el JSON
+                "COMPRADO": id_recompensa in recompensas_compradas_set  # Si la recompensa está comprada, poner COMPRADO: true
+            }
+            recompensasList.append(recompensa_dict)
+
+        return jsonify({"Recompensas": recompensasList}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    finally:
-        cursor.close()
         
         
 #Emmanuel
@@ -509,59 +537,83 @@ def verificar_registroReto():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-def obtenerRecompensas():
+from flask import request, jsonify, current_app
+
+
+def comprarRecompensa():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
     
     data = request.json
     id_usuario = data.get('id_usuario')
+    id_recompensa = data.get('id_recompensa')
 
     try:
         cursor = conn.cursor()
 
-        # Consulta para obtener todas las recompensas con NOMBRE, COSTO, DESCRIPCION y RESTANTES
-        recompensas_query = "SELECT ID_RECOMPENSA, NOMBRE, DESCRIPCION, COSTO, RESTANTES FROM RECOMPENSAS"
-        cursor.execute(recompensas_query)
-        recompensas = cursor.fetchall()
-
-        # Verificar si hay recompensas
-        if not recompensas:
-            return jsonify({"message": "No hay recompensas disponibles"}), 404
-
-        # Obtener las recompensas ya compradas por el usuario
-        compradas_query = """
-        SELECT ID_RECOMPENSA 
-        FROM USUARIOS_RECOMPENSAS 
-        WHERE ID_USUARIO = %s
+        # 1. Obtener el puntaje del usuario
+        query_puntaje_usuario = """
+        SELECT PUNTAJE FROM USUARIOS WHERE ID_USUARIO = %s
         """
-        cursor.execute(compradas_query, (id_usuario,))
-        recompensas_compradas = cursor.fetchall()
+        cursor.execute(query_puntaje_usuario, (id_usuario,))
+        resultado_usuario = cursor.fetchone()
 
-        # Convertir las recompensas compradas en un conjunto para fácil búsqueda
-        recompensas_compradas_set = {row[0] for row in recompensas_compradas}
+        # Verificar si se obtuvo un resultado
+        if resultado_usuario is None:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+        
+        puntaje_usuario = resultado_usuario[0]
 
-        # Generar la lista de recompensas con el campo extra "COMPRADO" y excluyendo las que tienen RESTANTES = 0
-        recompensasList = []
-        for recompensa in recompensas:
-            id_recompensa, nombre, descripcion, costo, restantes = recompensa  # Extraemos los campos incluyendo RESTANTES
-            
-            # Si el valor de RESTANTES es 0, no incluir la recompensa en la lista
-            if restantes == 0:
-                continue
+        # 2. Obtener el costo y restantes de la recompensa
+        query_recompensa = """
+        SELECT COSTO, RESTANTES FROM RECOMPENSAS WHERE ID_RECOMPENSA = %s
+        """
+        cursor.execute(query_recompensa, (id_recompensa,))
+        resultado_recompensa = cursor.fetchone()
 
-            # Crear un diccionario para la recompensa
-            recompensa_dict = {
-                "ID_RECOMPENSA": id_recompensa,
-                "NOMBRE": nombre,
-                "DESCRIPCION": descripcion,
-                "COSTO": costo,
-                "RESTANTES": restantes,  # Incluimos el campo RESTANTES en el JSON
-                "COMPRADO": id_recompensa in recompensas_compradas_set  # Si la recompensa está comprada, poner COMPRADO: true
-            }
-            recompensasList.append(recompensa_dict)
+        # Verificar si se obtuvo un resultado
+        if resultado_recompensa is None:
+            return jsonify({"error": "Recompensa no encontrada"}), 404
 
-        return jsonify({"Recompensas": recompensasList}), 200
+        costo_recompensa, restantes_recompensa = resultado_recompensa
+
+        # 3. Verificar si el usuario tiene suficientes monedas
+        if puntaje_usuario < costo_recompensa:
+            return jsonify({"message": "No tienes suficientes monedas"}), 400
+
+        # 4. Verificar si quedan recompensas disponibles
+        if restantes_recompensa <= 0:
+            return jsonify({"message": "No quedan recompensas disponibles"}), 400
+
+        # 5. Realizar las actualizaciones:
+        # Restar el costo de la recompensa al puntaje del usuario
+        update_puntaje_usuario = """
+        UPDATE USUARIOS SET PUNTAJE = PUNTAJE - %s WHERE ID_USUARIO = %s
+        """
+        cursor.execute(update_puntaje_usuario, (costo_recompensa, id_usuario))
+
+        # Restar 1 a las recompensas restantes
+        update_recompensa_restantes = """
+        UPDATE RECOMPENSAS SET RESTANTES = RESTANTES - 1 WHERE ID_RECOMPENSA = %s
+        """
+        cursor.execute(update_recompensa_restantes, (id_recompensa,))
+
+        # 6. Registrar la compra en la tabla USUARIOS_RECOMPENSAS (si tienes esta tabla)
+        insert_compra = """
+        INSERT INTO USUARIOS_RECOMPENSAS (ID_USUARIO, ID_RECOMPENSA) VALUES (%s, %s)
+        """
+        cursor.execute(insert_compra, (id_usuario, id_recompensa))
+
+        # Confirmar los cambios en la base de datos
+        conn.commit()
+
+        return jsonify({"message": "Compra realizada con éxito"}), 200
 
     except Exception as e:
+        # En caso de error, devolver mensaje de error
         return jsonify({"error": str(e)}), 500
+
+
+    
+    
