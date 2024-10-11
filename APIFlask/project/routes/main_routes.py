@@ -276,7 +276,7 @@ def comprarRoute():
    return comprarRecompensa()
  
  
-@bp.route('/<int:id_usuario>/puntos', methods=['GET'])
+@bp.route('/puntos-user', methods=['POST'])
 @limiter.limit("100 per minute")
 def puntosUserRoute():
    return get_puntos_usuario()

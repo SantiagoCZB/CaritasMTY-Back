@@ -593,19 +593,26 @@ def comprarRecompensa():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 
 def get_puntos_usuario():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
 
-    id_usuario = request.args.get('id_usuario')
+    # Obtener el JSON del body
+    data = request.get_json()
+
+    # Asegurarse de que el campo id_usuario fue proporcionado
+    id_usuario = data.get('id_usuario')
     
     if not id_usuario:
         return jsonify({"error": "id_usuario is required"}), 400
     
     try:
         cursor = conn.cursor()
+
+        # Consulta para obtener el puntaje del usuario
         query = "SELECT PUNTAJE FROM USUARIOS WHERE ID_USUARIO = %s"
         cursor.execute(query, (id_usuario,))
         puntos = cursor.fetchone()
