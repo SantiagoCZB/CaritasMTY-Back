@@ -19,7 +19,10 @@ def login():
         cursor = conn.cursor()
 
         # Ejecutar la consulta
-        query = "SELECT * FROM USUARIOS WHERE USUARIO = %s AND CONTRASEÑA = %s"
+        query = """
+        SELECT * FROM USUARIOS
+        WHERE USUARIO = %s AND CONTRASEÑA = HASHBYTES('SHA2_256', %s)
+        """
         cursor.execute(query, (usuario, contrasena))
 
         # Obtener resultados
