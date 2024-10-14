@@ -18,15 +18,15 @@ def login():
     try:
         cursor = conn.cursor()
 
-        # Hashear la contraseña ingresada usando SHA-256
-        hash_contrasena = hashlib.sha256(contrasena.encode('utf-8')).hexdigest()
+        # Hashear la contraseña usando SHA-256 (sin convertir a hexadecimal)
+        hash_contrasena = hashlib.sha256(contrasena.encode('utf-8')).digest()  # .digest() devuelve el binario
 
-        # Ejecutar la consulta
+        # Ejecutar la consulta, sin convertir a VARCHAR
         query = """
         SELECT * 
         FROM USUARIOS 
         WHERE USUARIO = %s AND 
-        CONVERT(VARCHAR(64), CONTRASEÑA, 2) = %s
+        CONTRASEÑA = %s
         """
         cursor.execute(query, (usuario, hash_contrasena))
 
