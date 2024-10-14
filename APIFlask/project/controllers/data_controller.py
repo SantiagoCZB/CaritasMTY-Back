@@ -18,18 +18,17 @@ def login():
     try:
         cursor = conn.cursor()
 
-        # Hash de la contraseña ingresada convertida a hexadecimal
-        query_hash = "SELECT CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', %s), 2)"
-        cursor.execute(query_hash, (contrasena,))
-        contrasena_hash = cursor.fetchone()[0]
+        # Hash de la contraseña ingresada en formato hexadecimal
+        hash_contrasena = f"{contrasena}".encode('utf-8').hex()
 
-        # Consulta para validar el login
+        # Ejecutar la consulta
         query = """
-        SELECT * FROM USUARIOS 
-        WHERE USUARIO = %s 
-        AND CONVERT(VARCHAR(64), CONTRASEÑA, 2) = %s
+        SELECT * 
+        FROM USUARIOS 
+        WHERE USUARIO = %s AND 
+        CONVERT(VARCHAR(64), CONTRASEÑA, 2) = %s
         """
-        cursor.execute(query, (usuario, contrasena_hash))
+        cursor.execute(query, (usuario, hash_contrasena))
 
         # Obtener resultados
         user_data = cursor.fetchone()
