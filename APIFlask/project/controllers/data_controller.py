@@ -18,12 +18,18 @@ def login():
     try:
         cursor = conn.cursor()
 
-        # Ejecutar la consulta
+        # Hash de la contraseña ingresada convertida a hexadecimal
+        query_hash = "SELECT CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', %s), 2)"
+        cursor.execute(query_hash, (contrasena,))
+        contrasena_hash = cursor.fetchone()[0]
+
+        # Consulta para validar el login
         query = """
-        SELECT * FROM USUARIOS
-        WHERE USUARIO = %s AND CONTRASEÑA = HASHBYTES('SHA2_256', %s)
+        SELECT * FROM USUARIOS 
+        WHERE USUARIO = %s 
+        AND CONVERT(VARCHAR(64), CONTRASEÑA, 2) = %s
         """
-        cursor.execute(query, (usuario, contrasena))
+        cursor.execute(query, (usuario, contrasena_hash))
 
         # Obtener resultados
         user_data = cursor.fetchone()
@@ -40,6 +46,7 @@ def login():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 
