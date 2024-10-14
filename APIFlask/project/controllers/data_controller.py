@@ -1,5 +1,6 @@
 from flask import request, jsonify, current_app
 from datetime import time, date
+import hashlib
 
 #!Santiago?
 def login():
@@ -7,7 +8,6 @@ def login():
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
 
-    # Obtener usuario y contraseña desde el cuerpo de la petición (POST)
     data = request.json
     usuario = data.get('usuario')
     contrasena = data.get('contrasena')
@@ -18,8 +18,8 @@ def login():
     try:
         cursor = conn.cursor()
 
-        # Hash de la contraseña ingresada en formato hexadecimal
-        hash_contrasena = f"{contrasena}".encode('utf-8').hex()
+        # Hashear la contraseña ingresada usando SHA-256
+        hash_contrasena = hashlib.sha256(contrasena.encode('utf-8')).hexdigest()
 
         # Ejecutar la consulta
         query = """
@@ -33,11 +33,8 @@ def login():
         # Obtener resultados
         user_data = cursor.fetchone()
 
-        # Si el usuario existe
         if user_data:
-            # Obtener nombres de las columnas
             column_names = [desc[0] for desc in cursor.description]
-            # Convertir el resultado en un diccionario
             user_dict = dict(zip(column_names, user_data))
             return jsonify({"message": "Login exitoso", "user": user_dict}), 200
         else:
