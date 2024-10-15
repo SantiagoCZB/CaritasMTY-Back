@@ -144,9 +144,10 @@ def currentEvents(id_usuario):
         LEFT JOIN USUARIOS_EVENTOS UE 
         ON E.ID_EVENTO = UE.ID_EVENTO 
         AND UE.ID_USUARIO = %s
-        WHERE (E.FECHA > CAST(GETDATE() AS DATE) 
+        WHERE 
+        (E.FECHA > CAST(GETDATE() AS DATE) 
         OR (E.FECHA = CAST(GETDATE() AS DATE) AND E.HORA > CAST(GETDATE() AS TIME)))
-        AND (UE.ASISTENCIA = 0)
+        AND (UE.ID_USUARIO IS NULL OR UE.ASISTENCIA = 0)
         """
         cursor.execute(query, (id_usuario,))
 
