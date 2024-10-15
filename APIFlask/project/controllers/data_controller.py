@@ -362,7 +362,12 @@ def obtenerRetos():
         cursor = conn.cursor()
 
         # Consulta para obtener todos los registros de la tabla RETOS
-        query = "SELECT * FROM RETOS"
+        query = """
+        SELECT R.ID_RETO, R.NOMBRE, R.DESCRIPCION, R.PUNTAJE
+        FROM RETOS R
+        LEFT JOIN USUARIOS_RETOS UR ON R.ID_RETO = UR.ID_RETO AND UR.ID_USUARIO = %s
+        WHERE UR.CUMPLIDO IS NULL OR UR.CUMPLIDO = 0
+        """
         cursor.execute(query)
 
         # Obtener todos los resultados
