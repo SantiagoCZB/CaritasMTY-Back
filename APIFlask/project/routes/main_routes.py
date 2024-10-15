@@ -74,6 +74,16 @@ def cancelar_registro():
                 error:
                   type: string
                   description: Mensaje de error
+      429:
+        description: "Too Many Requests"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Demasiadas Solicitudes"
       500:
         description: Error de conexión o consulta a la base de datos
         content:
@@ -145,6 +155,16 @@ def users():
                 message:
                   type: string
                   example: "No hay usuarios disponibles"
+      429:
+        description: "Too Many Requests"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Demasiadas Solicitudes"
       500:
         description: "Database connection or query error"
         content:
@@ -217,6 +237,16 @@ def events(id_usuario):
                 message:
                   type: string
                   example: "No hay eventos disponibles"
+      429:
+        description: "Demasiadas Solicitudes a la API"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Demasiadas Solicitudes"
       500:
         description: "Error de la base de datos o de consulta"
         content:
