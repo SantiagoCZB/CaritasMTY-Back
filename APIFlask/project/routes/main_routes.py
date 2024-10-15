@@ -75,7 +75,7 @@ def cancelar_registro():
                   type: string
                   description: Mensaje de error
       429:
-        description: "Too Many Requests"
+        description: "Demasiadas Solicitudes a la API"
         content:
           application/json:
             schema:
@@ -156,7 +156,7 @@ def users():
                   type: string
                   example: "No hay usuarios disponibles"
       429:
-        description: "Too Many Requests"
+        description: "Demasiadas Solicitudes a la API"
         content:
           application/json:
             schema:
