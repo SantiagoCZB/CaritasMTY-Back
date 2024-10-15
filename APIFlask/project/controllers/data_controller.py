@@ -140,10 +140,14 @@ def currentEvents():
 
         # Consulta para obtener los eventos que aún no han ocurrido
         query = """
-        SELECT * 
-        FROM EVENTOS 
-        WHERE (FECHA > CAST(GETDATE() AS DATE)) 
-        OR (FECHA = CAST(GETDATE() AS DATE) AND HORA > CAST(GETDATE() AS TIME))
+        SELECT E.* 
+        FROM EVENTOS E
+        LEFT JOIN USUARIOS_EVENTOS UE 
+        ON E.ID_EVENTO = UE.ID_EVENTO 
+        AND UE.ID_USUARIO = %s
+        WHERE (E.FECHA > CAST(GETDATE() AS DATE) 
+        OR (E.FECHA = CAST(GETDATE() AS DATE) AND E.HORA > CAST(GETDATE() AS TIME)))
+        AND (UE.ASISTENCIA IS NULL OR UE.ASISTENCIA = 0)
         """
         cursor.execute(query)
 
@@ -281,14 +285,11 @@ def mis_eventos(id_usuario):
 
         # Consulta SQL para obtener solo los eventos con asistencia en 0
         query = """
-        SELECT E.* 
-        FROM EVENTOS E
-        LEFT JOIN USUARIOS_EVENTOS UE 
-        ON E.ID_EVENTO = UE.ID_EVENTO 
-        AND UE.ID_USUARIO = %s
-        WHERE (E.FECHA > CAST(GETDATE() AS DATE) 
-        OR (E.FECHA = CAST(GETDATE() AS DATE) AND E.HORA > CAST(GETDATE() AS TIME)))
-        AND (UE.ASISTENCIA IS NULL OR UE.ASISTENCIA = 0)
+        SELECT E.ID_EVENTO, E.TITULO, E.FECHA, E.HORA, E.DESCRIPCION, E.CUPO, E.PUNTOS, E.TIPO_EVENTO 
+        FROM USUARIOS_EVENTOS UE
+        JOIN EVENTOS E ON UE.ID_EVENTO = E.ID_EVENTO
+        WHERE UE.ID_USUARIO = %s
+        AND UE.ASISTENCIA = 0
         """
         cursor.execute(query, (id_usuario,))
 
