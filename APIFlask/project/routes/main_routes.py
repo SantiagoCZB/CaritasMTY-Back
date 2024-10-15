@@ -23,7 +23,7 @@ def registrar_evento():
    return registrar()
 
 # Probamos en cURL así (Después del registrar evento. Escapar comillas dentro del formato JSON con '\'):
-# curl -X DELETE -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" http://127.0.0.1:3000/cancelar_registro
+# curl -X DELETE -k -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" https://realmadswift.tc2007b.tec.mx:10206/cancelar_registro
 @bp.route('/cancelar_registro', methods=['DELETE'])
 @limiter.limit("100 per minute")
 def cancelar_registro():
