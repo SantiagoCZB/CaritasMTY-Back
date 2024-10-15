@@ -134,7 +134,6 @@ def currentEvents():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
-
     try:
         cursor = conn.cursor()
 
