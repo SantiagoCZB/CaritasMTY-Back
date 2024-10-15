@@ -2,7 +2,7 @@ from flask import request, jsonify, current_app
 from datetime import time, date
 import hashlib
 
-#!Santiago?
+#!Santiago
 def login():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:

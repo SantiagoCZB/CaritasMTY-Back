@@ -162,7 +162,7 @@ def users():
 @limiter.limit("100 per minute")
 def events(id_usuario):
    """
-    Despliega todos los eventos disponibles desde la base de datos
+    Despliega todos los eventos disponibles desde la base de datos para el usuario correspondiente a la id
     ---
     responses:
       200:
