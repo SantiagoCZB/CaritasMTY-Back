@@ -19,7 +19,7 @@ def login():
         cursor = conn.cursor()
 
         # Hashear la contraseña usando SHA-256 (sin convertir a hexadecimal)
-        hash_contrasena = hashlib.sha256(contrasena.encode('utf-8')).digest()  # .digest() devuelve el binario
+        hash_contrasena = hashlib.md5(contrasena.encode('utf-8')).hexdigest()
 
         # Ejecutar la consulta, sin convertir a VARCHAR
         query = """
