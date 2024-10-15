@@ -16,7 +16,7 @@ def loginRoute():
 
 
 # Probamos en cURL
-# curl -X POST -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" http://127.0.0.1:3000/registrar_evento
+# curl -X POST -k -H "Content-Type: application/json" -d "{\"id_usuario\":3,\"id_evento\":3}" https://realmadswift.tc2007b.tec.mx:10206/registrar_evento
 @bp.route('/registrar_evento', methods=['POST'])
 @limiter.limit("100 per minute")
 def registrar_evento():
