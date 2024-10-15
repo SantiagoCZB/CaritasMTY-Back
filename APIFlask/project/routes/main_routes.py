@@ -158,9 +158,9 @@ def users():
    """
    return get_users()
 
-@bp.route('/events', methods=['GET'])
+@bp.route('/<int:id_usuario>/events', methods=['GET'])
 @limiter.limit("100 per minute")
-def events():
+def events(id_usuario):
    """
     Despliega todos los eventos disponibles desde la base de datos
     ---
@@ -228,7 +228,7 @@ def events():
                   type: string
                   description: "Mensaje de error"
    """
-   return currentEvents()
+   return currentEvents(id_usuario)
 
 @bp.route('/<int:id_usuario>/mis-eventos', methods=['GET'])
 @limiter.limit("100 per minute")
@@ -240,10 +240,10 @@ def mis_eventosRoute(id_usuario):
 def verificar_registroRoute():
    return verificar_registro()
  
-@bp.route('/retos', methods=['GET'])
+@bp.route('/<int:id_usuario>/retos', methods=['GET'])
 @limiter.limit("100 per minute")
-def retos():
-  return obtenerRetos()
+def retos(id_usuario):
+  return obtenerRetos(id_usuario)
 
 @bp.route('/<int:id_usuario>/mis-retos', methods=['GET'])
 @limiter.limit("100 per minute")

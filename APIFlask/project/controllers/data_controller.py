@@ -130,7 +130,7 @@ def cancelar():
         return jsonify({"error": str(e)}), 500
     
 
-def currentEvents():
+def currentEvents(id_usuario):
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
@@ -148,7 +148,7 @@ def currentEvents():
         OR (E.FECHA = CAST(GETDATE() AS DATE) AND E.HORA > CAST(GETDATE() AS TIME)))
         AND (UE.ASISTENCIA = 0)
         """
-        cursor.execute(query)
+        cursor.execute(query, (id_usuario,))
 
         # Obtener todos los resultados
         events = cursor.fetchall()
@@ -352,7 +352,7 @@ def verificar_registro():
         return jsonify({"error": str(e)}), 500
     
         
-def obtenerRetos():
+def obtenerRetos(id_usuario):
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
         return jsonify({"error": "No database connection available"}), 500
@@ -362,12 +362,14 @@ def obtenerRetos():
 
         # Consulta para obtener todos los registros de la tabla RETOS
         query = """
-        SELECT R.ID_RETO, R.NOMBRE, R.DESCRIPCION, R.PUNTAJE
+        SELECT R.* 
         FROM RETOS R
-        LEFT JOIN USUARIOS_RETOS UR ON R.ID_RETO = UR.ID_RETO AND UR.ID_USUARIO = %s
-        WHERE UR.CUMPLIDO IS NULL OR UR.CUMPLIDO = 0
+        LEFT JOIN USUARIOS_RETOS UR 
+        ON R.ID_RETO = UR.ID_RETO 
+        AND UR.ID_USUARIO = %s
+        WHERE UR.ID_USUARIO IS NULL OR UR.CUMPLIDO = 0
         """
-        cursor.execute(query)
+        cursor.execute(query, (id_usuario,))
 
         # Obtener todos los resultados
         retos = cursor.fetchall()
