@@ -147,7 +147,7 @@ def currentEvents():
         AND UE.ID_USUARIO = %s
         WHERE (E.FECHA > CAST(GETDATE() AS DATE) 
         OR (E.FECHA = CAST(GETDATE() AS DATE) AND E.HORA > CAST(GETDATE() AS TIME)))
-        AND (UE.ASISTENCIA IS NULL OR UE.ASISTENCIA = 0)
+        AND (UE.ASISTENCIA = 0)
         """
         cursor.execute(query)
 
