@@ -18,7 +18,7 @@ def login():
     try:
         cursor = conn.cursor()
 
-        # Hashear la contraseña usando SHA-256 (sin convertir a hexadecimal)
+        # Hashear la contraseña usando MD5 (sin convertir a hexadecimal)
         hash_contrasena = hashlib.md5(contrasena.encode('utf-8')).hexdigest()
 
         # Ejecutar la consulta, sin convertir a VARCHAR
@@ -214,7 +214,7 @@ def get_users():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-#!Kevin
+#!Santiago
 def obtenerRecompensas():
     conn = current_app.config['DB_CONNECTION']
     if conn is None:
